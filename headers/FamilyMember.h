@@ -17,16 +17,11 @@ private:
     // ручные динамические массивы (без STL контейнеров)
     std::string* parents;
     int parents_count;
-    int parents_capacity;
-
-    std::string spouse;
 
     std::string* children;
     int children_count;
-    int children_capacity;
-
-    void ensure_parents_capacity();
-    void ensure_children_capacity();
+ 
+    std::string spouse;
 
 public:
     FamilyMember() = default;
@@ -40,9 +35,23 @@ public:
     void setName(const std::string& name);
     std::string getName() const;
 
+    void setBirthDate(const std::string& date);
+    std::string getBirthDate() const;
+
+    void setDeathDate(const std::string& date);
+    std::string getDeathDate() const;
+
+    void setAge(const int age);
+    int getAge() const;
+
     void addParent(const std::string& p);
+    std::string getParents() const;
+
     void addChild(const std::string& c);
+    std::string getChild() const;
+
     void setSpouse(const std::string& s);
+    std::string getSpouse() const;
 
     // Реализация Base
     void show() const override;

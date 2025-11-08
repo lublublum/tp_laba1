@@ -13,7 +13,9 @@ public:
     virtual void edit() = 0;
     virtual void save(std::ostream& os) const = 0;
     virtual void load(std::istream& is) = 0;
-    virtual ~Base();
+    virtual ~Base() {
+        std::cout << "Base destructor called\n";
+    }
 };
 
 #endif //BASE_H
