@@ -13,8 +13,11 @@ public:
     virtual void edit() = 0;
     virtual void save(std::ostream& os) const = 0;
     virtual void load(std::istream& is) = 0;
+    Base(){
+        std::cout << "\033[33mBase constructor called\033[0m\n";
+    }
     virtual ~Base() {
-        std::cout << "Base destructor called\n";
+        std::cout << "\033[33mBase destructor called\033[0m\n";
     }
 };
 

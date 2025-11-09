@@ -3,6 +3,8 @@
 
 #include <iostream>
 #include "Base.h"
+#include "FamilyMember.h"
+#include <fstream>
 #include <string>
 
 void keeper_hello();
