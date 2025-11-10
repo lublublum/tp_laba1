@@ -1,12 +1,13 @@
 #include "Keeper.h"
 
 void keeper_hello() {
-    std::cout << "Keeper hello!\n";
+    std::cout << "\033[33mKeeper hello!\033[0m\n";
 }
 
 Keeper::Keeper() : members(nullptr), size(0), capacity(0) {
     std::cout << "\033[33mKeeper constructor called\033[0m\n";
 }
+
 Keeper::~Keeper() {
     clear();
     std::cout << "\033[33mKeeper destructor called\033[0m\n";
@@ -20,76 +21,80 @@ void Keeper::ensure_capacity() {
     else if (size >= capacity) {
         int newcap = capacity * 2;
         Base** tmp = new Base * [newcap];
-        for (int i = 0; i < size; ++i) tmp[i] = members[i];
+        for (int i = 0; i < size; ++i)
+            tmp[i] = members[i];
         delete[] members;
         members = tmp;
         capacity = newcap;
     }
 }
-void Keeper::add(Base* obj) {      // владеет obj (удалит в деструкторе)
+
+void Keeper::add(Base* obj) {
     ensure_capacity();
     members[size++] = obj;
 }
-void Keeper::remove(int index) {   // удалить по индексу
+
+void Keeper::remove(int index) {
     if (index < 0 || index >= size) {
-        throw std::out_of_range("Index out of range");
+        throw std::out_of_range("Неверный индекс");
     }
     delete members[index];
-    for (int i = index; i < size -1; ++i){
+    for (int i = index; i < size - 1; ++i)
         members[i] = members[i + 1];
-    } 
     members[--size] = nullptr;
-    std::cout << " Member removed \n";
 }
-void Keeper::showAll() const {
-    for (int i = 0; i < size; i++) {
-        std::cout << "========== Member number " << i+1 << " ==========\n";
-        members[i]->show();
-        std::cout << "\n";
-    }
 
+void Keeper::showAll() const {
+    if (size == 0) {
+        std::cout << "Нет членов семьи.\n";
+        return;
+    }
+    for (int i = 0; i < size; ++i) {
+        std::cout << "\033[34m\n========= Член семьи #" << i + 1 << " =========\033[0m\n";
+        members[i]->show();
+    }
 }
 
 void Keeper::saveToFile(const std::string& filename) const {
     std::ofstream ofs(filename.c_str());
-    if (!ofs){
-        throw std::runtime_error("Cannot open file for writing");
-    } 
+    if (!ofs)
+        throw std::runtime_error("Не удалось открыть файл для записи");
+
     ofs << size << "\n";
     for (int i = 0; i < size; ++i) {
-        // since only FamilyMember implemented, tag them
-        ofs << "FM\n";
+        ofs << members[i]->getType() << "\n";
         members[i]->save(ofs);
     }
     ofs.close();
-    std::cout << "Saved " << size << " members to " << filename << "\n";
+    std::cout << "\033[33mСохранено " << size << " объектов в " << filename << "\033[0m\n";
 }
 
 void Keeper::loadFromFile(const std::string& filename) {
     std::ifstream ifs(filename.c_str());
-    if (!ifs) {
-        throw std::runtime_error("Cannot open file for reading");
-    }
+    if (!ifs)
+        throw std::runtime_error("Не удалось открыть файл для чтения");
+
     clear();
-    std::string line;
-    std::getline(ifs, line);
-    int cnt = std::stoi(line);
-    for (int i = 0; i < cnt; ++i) {
-        std::getline(ifs, line); // type tag
-        if (line == "FM") {
+    int count;
+    ifs >> count;
+    ifs.ignore();
+
+    for (int i = 0; i < count; ++i) {
+        std::string type;
+        std::getline(ifs, type);
+        if (type == "FamilyMember") {
             FamilyMember* fm = new FamilyMember();
             fm->load(ifs);
             add(fm);
         }
         else {
-            throw std::runtime_error("Unknown type tag in file");
+            throw std::runtime_error("Неизвестный тип объекта в файле");
         }
     }
     ifs.close();
-    std::cout << "Loaded " << size << " members from " << filename << "\n";
+    std::cout << "\033[33mЗагружено " << size << " объектов из " << filename << "\033[0m\n";
 }
 
-// очистить все и освободить память
 void Keeper::clear() {
     for (int i = 0; i < size; ++i)
         delete members[i];
